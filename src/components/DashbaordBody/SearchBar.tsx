@@ -1,10 +1,12 @@
 import {FC} from 'react';
+import {Box} from "@mui/material";
 
 const SearchBar: FC<{}> = ({}) => {
     return (
-        <div>
-
-        </div>
+        <Box sx={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+            <input type="text" placeholder="Rechercher un produit"/>
+            <button>Rechercher</button>
+        </Box>
     );
 };
 

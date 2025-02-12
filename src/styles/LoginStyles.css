@@ -1,7 +1,5 @@
 body {
     background-color: #87CEEB;
-    height: 100vh;
-    overflow: hidden;
 }
 
 .saumon-wrapper {
@@ -60,7 +58,7 @@ body {
 }
 
 .container {
-    height: 707px;
+    height: 595px;
     margin: auto;
     display: flex;
     align-items: center;

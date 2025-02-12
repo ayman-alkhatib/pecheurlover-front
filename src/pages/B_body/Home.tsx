@@ -2,11 +2,20 @@ import '../../styles/LoginStyles.css';
 import React, {useState, useEffect, useContext} from "react";
 import {useNavigate} from "react-router-dom";
 import {AuthContext} from "../../context/AuthContext";
+import {createGlobalStyle} from "styled-components";
 
 const Home = () => {
     const [saumons, setSaumons] = useState([]);
     const navigate = useNavigate();
     const {isLogged, setIsLogged} = useContext(AuthContext); // Récupérer le contexte
+
+    const GlobalStyle = createGlobalStyle`
+        body {
+            background-color: #87CEEB;
+            height: 100vh;
+            overflow: hidden;
+        }
+    `;
 
     useEffect(() => {
         const handleClick = (event: any) => {
@@ -34,6 +43,7 @@ const Home = () => {
 
     return (
         <>
+            <GlobalStyle/>
             <h1>Bienvenue chez Pêcheur Lover</h1>
             <div className="app">
                 <div className="container">
