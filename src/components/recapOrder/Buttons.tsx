@@ -12,7 +12,7 @@ const Buttons: FC<{ totalPrice: number; produits: any[] }> = ({totalPrice: props
 
     const navigate = useNavigate();
     // @ts-ignore
-    const {clearShoppingCart, cartItems, totalPrice: contextTotalPrice} = useContext(ShoppingCartContext);
+    const {clearShoppingCart, totalPrice: contextTotalPrice} = useContext(ShoppingCartContext);
     const [email, setEmail] = useState("");
     const [emailError, setEmailError] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -24,11 +24,9 @@ const Buttons: FC<{ totalPrice: number; produits: any[] }> = ({totalPrice: props
         const isValidEmail = value && /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/.test(value);
         setEmailError(!isValidEmail);
     };
-
     const handleContinueShopping = () => {
         navigate("/dashboard");
     };
-
     const handlePay = async () => {
         console.log("Produits envoyés depuis RecapDetails vers Buttons :", produits);
         setLoading(true);
@@ -41,18 +39,26 @@ const Buttons: FC<{ totalPrice: number; produits: any[] }> = ({totalPrice: props
                 quantity: item.quantity,
                 price: item.price,
             })));
+
             const priceToUse = propsTotalPrice || contextTotalPrice;
+            const priceAsNumber = parseFloat(priceToUse);
+            if (isNaN(priceAsNumber)) {
+                setErrorMessage("Le prix total est invalide.");
+                return;
+            }
+
             const invoiceResponse = await apiSpringBoot.post<InvoiceResponse>(
                 "/invoices/create",
                 {
-                    email,
+                    email: String(email),
                     invoice_date: new Date().toISOString().split("T")[0],
-                    total_price: priceToUse,
+                    total_price: priceAsNumber,
                 },
                 {
                     headers: {"Content-Type": "application/json"},
                 }
             );
+
             const {id_invoice} = invoiceResponse.data;
             const orderPromises = produits.map((item) =>
                 apiSpringBoot.post("/orders/create", {
@@ -62,12 +68,17 @@ const Buttons: FC<{ totalPrice: number; produits: any[] }> = ({totalPrice: props
                     price: item.price,
                 })
             );
+
             await Promise.all(orderPromises);
+
             clearShoppingCart();
             navigate("/dashboard");
+
         } catch (error: any) {
             console.error("Erreur lors de la création de la facture ou des commandes:", error);
-            setErrorMessage(error.response?.data?.message || "Une erreur est survenue.");
+            setErrorMessage(
+                error.response?.data?.message || error.message || "Une erreur est survenue."
+            );
         } finally {
             setLoading(false);
         }
@@ -116,8 +127,7 @@ const Buttons: FC<{ totalPrice: number; produits: any[] }> = ({totalPrice: props
                         textTransform: "none",
                         "&:hover": {backgroundColor: "#4da6e6"},
                     }}
-                >
-                    Continuer mes achats
+                > Continuer mes achats
                 </Button>
                 <Button
                     onClick={handlePay}
@@ -131,13 +141,11 @@ const Buttons: FC<{ totalPrice: number; produits: any[] }> = ({totalPrice: props
                         "&:hover": {backgroundColor: "#2672cc"},
                         opacity: loading ? 0.7 : 1,
                     }}
-                >
-                    {loading ? "Paiement..." : "Payer"}
+                >{loading ? "Paiement..." : "Payer"}
                 </Button>
             </Box>
         </>
     );
 };
-
 
 export default Buttons;

@@ -1,10 +1,8 @@
 import axios from "axios";
 
-// Création d'une instance spécifique pour ton backend Spring Boot
 const apiSpringBoot = axios.create({
-    baseURL: "http://localhost:8080/" // Change l'URL selon ton backend
+    baseURL: "http://localhost:8080/"
 });
-
 
 export const getData = (url: string, config = {}) => {
     return apiSpringBoot.get(url, config)
