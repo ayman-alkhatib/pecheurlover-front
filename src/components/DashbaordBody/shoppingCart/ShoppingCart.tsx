@@ -51,8 +51,8 @@ const ShoppingCart = () => {
                                     <img className="cart-img" src={produit.imageUrl} alt={produit.name}
                                          style={{width: 70, height: 40, borderRadius: "8px"}}/>
                                     <Typography variant="body1">
-                                        {produit.quantity} x {produit.name} - {produit.price}€/pu
-                                        = <strong>{produit.totalPrice}€</strong>
+                                        {produit.quantity} x {produit.name} - {produit.price.toFixed(2)}€/pu
+                                        = <strong>{produit.totalPrice.toFixed(2)}€</strong>
                                     </Typography>
                                 </div>
                                 <div className="cart-actions" style={{
@@ -82,7 +82,7 @@ const ShoppingCart = () => {
                     </ul>
                     <Typography variant="h6" sx={{textAlign: "right", mb: 2}}>
                         🛒 Total
-                        : <strong>{shoppingCart.reduce((total, produit) => total + produit.totalPrice, 0)}€</strong>
+                        : <strong>{shoppingCart.reduce((total, produit) => total + produit.totalPrice, 0).toFixed(2)}€</strong>
                     </Typography>
                     <Box sx={{display: "flex", flexDirection: "row", gap: 2, justifyContent: "center", alignItems: "center", width: "100%", mb:2}}>
                         <Button onClick={clearShoppingCart} variant="contained" color="error" fullWidth>

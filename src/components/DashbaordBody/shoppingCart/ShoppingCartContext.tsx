@@ -1,4 +1,4 @@
-import {createContext, useState, ReactNode} from "react";
+import {createContext, useState, ReactNode, useEffect} from "react";
 import {ProductItem} from "../../../@types/ProductItem";
 
 interface CartItem extends ProductItem {
@@ -12,19 +12,23 @@ interface ShoppingCartContextType {
     removeShoppingCart: (productId: number) => void;
     updateQuantity: (productId: number, action: "increase" | "decrease") => void;
     clearShoppingCart: () => void;
+    totalPrice: number;
 }
-
 
 export const ShoppingCartContext = createContext<ShoppingCartContextType | undefined>(undefined);
 
 export const ShoppingCartProvider = ({children}: { children: ReactNode }) => {
     const [shoppingCart, setShoppingCart] = useState<CartItem[]>([]);
+    const [totalPrice, setTotalPrice] = useState(0);
 
-    // Ajoute un produit au panier
+    useEffect(() => {
+        const price = shoppingCart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        setTotalPrice(price);
+    }, [shoppingCart]);
+
     const addShoppingCart = (product: ProductItem) => {
         setShoppingCart((prevCart) => {
             const productExist = prevCart.find((item) => item.id_product === product.id_product);
-
             if (productExist) {
                 return prevCart.map((item) =>
                     item.id_product === product.id_product
@@ -37,14 +41,10 @@ export const ShoppingCartProvider = ({children}: { children: ReactNode }) => {
         });
     };
 
-    // Supprime un produit du panier
     const removeShoppingCart = (productId: number) => {
-        setShoppingCart((prevCart) =>
-            prevCart.filter((item) => item.id_product !== productId)
-        );
+        setShoppingCart((prevCart) => prevCart.filter((item) => item.id_product !== productId));
     };
 
-    // Met à jour la quantité d'un produit dans le panier
     const updateQuantity = (productId: number, action: "increase" | "decrease") => {
         setShoppingCart((prevCart) =>
             prevCart.map((item) =>
@@ -55,7 +55,7 @@ export const ShoppingCartProvider = ({children}: { children: ReactNode }) => {
                         totalPrice:
                             action === "increase"
                                 ? (item.quantity + 1) * item.price
-                                : Math.max(1, item.quantity - 1) * item.price
+                                : Math.max(1, item.quantity - 1) * item.price,
                     }
                     : item
             )
@@ -66,11 +66,10 @@ export const ShoppingCartProvider = ({children}: { children: ReactNode }) => {
         setShoppingCart([]);
     };
 
-
     return (
-        <ShoppingCartContext.Provider value={{shoppingCart, addShoppingCart, removeShoppingCart, updateQuantity,
-            clearShoppingCart}}>
-        {children}
+        <ShoppingCartContext.Provider
+            value={{shoppingCart, addShoppingCart, removeShoppingCart, updateQuantity, clearShoppingCart, totalPrice}}>
+            {children}
         </ShoppingCartContext.Provider>
     );
 };
