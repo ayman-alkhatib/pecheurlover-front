@@ -34,11 +34,11 @@ const Home = () => {
         };
     }, []);
 
-    // ✅ Fonction de connexion
+    // Fonction de connexion
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLogged(true); // Met à jour l'état global de connexion
-        navigate("/dashboard"); // Redirige vers le dashboard
+        setIsLogged(true);
+        navigate("/dashboard");
     };
 
     return (

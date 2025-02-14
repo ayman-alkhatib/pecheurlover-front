@@ -1,5 +1,5 @@
 import {FC} from 'react';
-import ShoppingCart from "../DashbaordBody/shoppingCart/ShoppingCart";
+import ShoppingCart from "../shoppingCart/ShoppingCart";
 
 const ListProductInOrder: FC<{}> = ({}) => {
     return (

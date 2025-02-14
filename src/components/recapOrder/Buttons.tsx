@@ -1,7 +1,7 @@
 import React, {FC, useContext, useState} from "react";
 import apiSpringBoot from "../../api/apiSpringBoot";
 import {Box, Button, Typography} from "@mui/material";
-import {ShoppingCartContext} from "../DashbaordBody/shoppingCart/ShoppingCartContext";
+import {ShoppingCartContext} from "../dashbaordBody/shoppingCart/ShoppingCartContext";
 import {useNavigate} from "react-router-dom";
 
 type InvoiceResponse = {
@@ -17,28 +17,29 @@ const Buttons: FC<{ totalPrice: number; produits: any[] }> = ({totalPrice: props
     const [emailError, setEmailError] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-
+    // Récupération de l'email de l'utilisateur
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setEmail(value);
         const isValidEmail = value && /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/.test(value);
         setEmailError(!isValidEmail);
     };
+    // Fonction pour retourner au dashboard
     const handleContinueShopping = () => {
         navigate("/dashboard");
     };
+    // Fonction pour le bouton payer
     const handlePay = async () => {
-        console.log("Produits envoyés depuis RecapDetails vers Buttons :", produits);
         setLoading(true);
         setErrorMessage("");
 
         try {
-            console.log("Données envoyées pour orders :", produits.map((item) => ({
+            produits.map((item) => ({
                 id_invoice: "ID_FACTURE_ICI",
                 id_product: item.id_product,
                 quantity: item.quantity,
                 price: item.price,
-            })));
+            }));
 
             const priceToUse = propsTotalPrice || contextTotalPrice;
             const priceAsNumber = parseFloat(priceToUse);
@@ -46,7 +47,18 @@ const Buttons: FC<{ totalPrice: number; produits: any[] }> = ({totalPrice: props
                 setErrorMessage("Le prix total est invalide.");
                 return;
             }
-
+            // Vérif du stock
+            for (const item of produits) {
+                type StockResponse = { stock: number };
+                const stockResponse = await apiSpringBoot.get<StockResponse>(`/products/${item.id_product}/stock`);
+                const stockDisponible = stockResponse.data.stock;
+                if (item.quantity > stockDisponible) {
+                    setErrorMessage(`❌ Stock insuffisant pour ${item.name} (disponible: ${stockDisponible}).`);
+                    setLoading(false);
+                    return;
+                }
+            }
+            // Création de facture + création de commandes + maj des stocks
             const invoiceResponse = await apiSpringBoot.post<InvoiceResponse>(
                 "/invoices/create",
                 {
@@ -54,28 +66,30 @@ const Buttons: FC<{ totalPrice: number; produits: any[] }> = ({totalPrice: props
                     invoice_date: new Date().toISOString().split("T")[0],
                     total_price: priceAsNumber,
                 },
-                {
-                    headers: {"Content-Type": "application/json"},
-                }
+                {headers: {"Content-Type": "application/json"}}
             );
 
             const {id_invoice} = invoiceResponse.data;
-            const orderPromises = produits.map((item) =>
-                apiSpringBoot.post("/orders/create", {
+
+            // Création de commandes + maj des stocks
+            const orderPromises = produits.map(async (item) => {
+                await apiSpringBoot.post("/orders/create", {
                     id_invoice,
                     id_product: item.id_product,
                     quantity: item.quantity,
                     price: item.price,
-                })
-            );
+                });
 
-            await Promise.all(orderPromises);
-
+                // maj du stock du produit
+                await apiSpringBoot.put(`/products/${item.id_product}/update-stock`, {
+                    newStock: item.stock - item.quantity
+                });
+            });
+            await Promise.all(orderPromises); // ✅ Exécute toutes les requêtes en parallèle
             clearShoppingCart();
             navigate("/dashboard");
 
         } catch (error: any) {
-            console.error("Erreur lors de la création de la facture ou des commandes:", error);
             setErrorMessage(
                 error.response?.data?.message || error.message || "Une erreur est survenue."
             );

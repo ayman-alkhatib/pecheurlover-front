@@ -1,9 +1,9 @@
 import {FC, useContext, useEffect, useState} from 'react';
-import {ProductItem} from "../@types/ProductItem";
+import {ProductItem} from "../../@types/ProductItem";
 import {Box, Button, Grid, Typography} from "@mui/material";
-import apiSpringBoot from '../api/apiSpringBoot';
+import apiSpringBoot from '../../api/apiSpringBoot';
 import styled from 'styled-components';
-import {ShoppingCartContext} from "./DashbaordBody/shoppingCart/ShoppingCartContext";
+import {ShoppingCartContext} from "./shoppingCart/ShoppingCartContext";
 import {useNavigate} from "react-router-dom";
 
 interface CardsProps {
@@ -19,11 +19,10 @@ const Cards = ({products}: CardsProps) => {
     const viewDetailsProduct = (id: number) => {
         navigate(`/product/${id}`);
     };
-
+    //Met la première lettre en majuscule
     const capitalizeFirstLetter = (str: string) => {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     };
-
     const hydrateCollection = async () => {
         try {
             const response = await apiSpringBoot.get<ProductItem[]>("products/all");
@@ -37,7 +36,6 @@ const Cards = ({products}: CardsProps) => {
     useEffect(() => {
         hydrateCollection();
     }, []);
-
     if (error) return <Typography color="error">{error}</Typography>;
     if (!allProducts) return <Typography>Chargement...</Typography>;
 
@@ -45,9 +43,6 @@ const Cards = ({products}: CardsProps) => {
     if (allProducts.length === 0) {
         return <Typography>Aucun produit disponible.</Typography>;
     }
-
-
-
     if (!cartContext) {
         return <Typography color="error">Erreur : Contexte du panier non disponible</Typography>;
     }
@@ -56,43 +51,42 @@ const Cards = ({products}: CardsProps) => {
 
     return (
         <Box mt={2}>
-            <Grid container spacing={3} sx={{display:"flex", justifyContent:"space-around", width: "100%"}}>
-                {allProducts.map((product) => (
-                    <Grid item key={product.id_product}
-                          sx={{textAlign: "center", margin: "30px", height: "100%"}}>
-                        <StyledCard>
-                            <div className="card">
-                                <img
-                                    className="card-img"
-                                    src={product.imageUrl}
-                                    alt={product.name}
-                                />
-                                <Typography variant="h5" className="title">
-                                    {capitalizeFirstLetter(product.name)}
-                                </Typography>
-                                <Box className="card-info">
-                                    <Typography variant="h6" className="price">
-                                        Prix : {product.price}€
+            <Grid container spacing={3} sx={{display: "flex", justifyContent: "space-around", width: "100%"}}>
+                {products.length > 0 ? ( // ✅ Utiliser `products` au lieu de `allProducts`
+                    products.map((product) => (
+                        <Grid item key={product.id_product} sx={{textAlign: "center", margin: "30px", height: "100%"}}>
+                            <StyledCard>
+                                <div className="card">
+                                    <img className="card-img" src={product.imageUrl} alt={product.name}/>
+                                    <Typography variant="h5" className="title">
+                                        {capitalizeFirstLetter(product.name)}
                                     </Typography>
-                                    <Typography variant="subtitle1" className="stock">
-                                        Quantité restante : {product.stock}
-                                    </Typography>
-                                    <Button onClick={() => viewDetailsProduct(product.id_product)}>En savoir
-                                        plus</Button>
-                                    <Button variant="contained" color="primary"
-                                            onClick={() => addShoppingCart(product)}>
-                                        Mettre au panier
-                                    </Button>
-                                </Box>
-                            </div>
-                        </StyledCard>
-                    </Grid>
-                ))}
+                                    <Box className="card-info">
+                                        <Typography variant="h6" className="price">
+                                            Prix : {product.price}€
+                                        </Typography>
+                                        <Typography variant="subtitle1" className="stock">
+                                            Quantité restante : {product.stock}
+                                        </Typography>
+                                        <Button onClick={() => viewDetailsProduct(product.id_product)}>
+                                            En savoir plus
+                                        </Button>
+                                        <Button variant="contained" color="primary"
+                                                onClick={() => addShoppingCart(product)}>
+                                            Mettre au panier
+                                        </Button>
+                                    </Box>
+                                </div>
+                            </StyledCard>
+                        </Grid>
+                    ))
+                ) : (
+                    <Typography>Aucun produit trouvé.</Typography> // ✅ Message si aucun produit ne correspond
+                )}
             </Grid>
         </Box>
     );
-};
-
+}
 // Styled-components pour le style de la carte
 const StyledCard = styled.div`
     .card {

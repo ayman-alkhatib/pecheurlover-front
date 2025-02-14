@@ -12,6 +12,7 @@
   width: 450px;
   height: 300px;
   border-radius: 15%;
+  box-Shadow: 0 0 8px 3px rgba(238, 139, 139, 1);
 }
 
 .App-logo {
@@ -96,3 +97,6 @@ ul {
   margin: 0 10px;
 }
 
+.cooking-tips {
+  margin-bottom: 5px;
+}

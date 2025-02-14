@@ -10,7 +10,7 @@ import {HelmetProvider} from "react-helmet-async";
 import LayoutWithBar from "./components/layouts/LayoutWithBar";
 import LayoutWithoutBar from "./components/layouts/LayoutWithoutBar";
 import { AuthContext } from './context/AuthContext';
-import {ShoppingCartProvider} from "./components/DashbaordBody/shoppingCart/ShoppingCartContext";
+import {ShoppingCartProvider} from "./components/dashbaordBody/shoppingCart/ShoppingCartContext";
 import ListOrders from "./pages/B_body/ListOrders";
 
 function App() {

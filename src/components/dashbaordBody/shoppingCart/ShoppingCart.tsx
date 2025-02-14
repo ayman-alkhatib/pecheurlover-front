@@ -7,21 +7,16 @@ import {Delete, Remove, Add} from "@mui/icons-material";
 const ShoppingCart = () => {
     const cartContext = useContext(ShoppingCartContext);
     const navigate = useNavigate();
-
-    const [email, setEmail] = useState(""); // ✅ État pour l'email
-    const [error, setError] = useState(false); // ✅ État pour la validation
-
+    const [email, setEmail] = useState("");
+    const [error, setError] = useState(false);
     const goToOrders = () => {
-        if (!email || !email.includes("@")) return; // 🔒 Empêche la navigation si l'email est invalide
-        navigate("/listOrders", {state: {email}}); // ✅ Envoi de l'email à la page commandes
+        if (!email || !email.includes("@")) return;
+        navigate("/listOrders", {state: {email}});
     };
-
     if (!cartContext) {
         return <Typography color="error">Erreur : Contexte du panier non disponible</Typography>;
     }
-
     const {shoppingCart, removeShoppingCart, updateQuantity, clearShoppingCart} = cartContext;
-
     const validateShoppingCart = () => {
         navigate("/recapOrder", {state: {produits: shoppingCart}});
     };
@@ -72,7 +67,6 @@ const ShoppingCart = () => {
                                                 onClick={() => updateQuantity(produit.id_product, "increase")}>
                                         <Add/>
                                     </IconButton>
-
                                     <Button onClick={() => removeShoppingCart(produit.id_product)} color="error">
                                         <Delete/>
                                     </Button>
