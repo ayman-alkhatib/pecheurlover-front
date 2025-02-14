@@ -6,25 +6,19 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {Box} from "@mui/material";
 import {getData} from "../../api/apiSpringBoot";
-import {FC} from "react";
+import {data} from "react-router-dom"; // Assurez-vous d'importer getData
 
-interface AccordionOrdersProps {
-    orders: any;
-}
-
-const AccordionOrders: FC<AccordionOrdersProps> = ({orders}) => {
+export default function ControlledAccordions() {
     const [expanded, setExpanded] = React.useState<string | false>(false);
     const [invoices, setInvoices] = React.useState<any[]>([]);
     const [ordersDetails, setOrdersDetails] = React.useState<Record<number, any[]>>({}); // Modifié pour un objet
-
     const handleChange = (panel: string) => async (event: React.SyntheticEvent, isExpanded: boolean) => {
         setExpanded(isExpanded ? panel : false);
-
         if (isExpanded) {
             const invoiceId = parseInt(panel.replace("panel", ""));
             await fetchOrdersDetails(invoiceId);
         } else {
-
+            // On ne supprime pas les commandes, juste on vide les détails de la commande pour le panel fermé
             setOrdersDetails(prevState => {
                 const updatedState = {...prevState};
                 delete updatedState[parseInt(panel.replace("panel", ""))];
@@ -32,7 +26,6 @@ const AccordionOrders: FC<AccordionOrdersProps> = ({orders}) => {
             });
         }
     };
-
     const fetchInvoices = async () => {
         try {
             const data = await getData("/invoices/all");
@@ -41,20 +34,18 @@ const AccordionOrders: FC<AccordionOrdersProps> = ({orders}) => {
             console.error("Erreur lors de la récupération des factures : ", error);
         }
     };
-
     const fetchOrdersDetails = async (id_invoice: number) => {
         if (ordersDetails[id_invoice]) {
             // Si les détails sont déjà récupérés, on ne refait pas la requête
             return;
         }
-
-
+        console.log("🔍 Réponse API orders:", data);
         try {
+            console.log(`Chargement des commandes pour la facture ID: ${id_invoice}`);
             const data = await getData(`/orders/by-invoice/${id_invoice}`);
-
+            console.log("Détails des commandes:", data);
             // Vérification si 'data' est un tableau ou un objet
             const normalizedData = Array.isArray(data) ? data : [data]; // Si ce n'est pas un tableau, on le transforme en tableau
-
             // Mettre à jour l'état avec les détails des commandes sous forme de tableau
             setOrdersDetails(prevState => ({
                 ...prevState,
@@ -64,18 +55,15 @@ const AccordionOrders: FC<AccordionOrdersProps> = ({orders}) => {
             console.error("Erreur lors de la récupération des détails des commandes : ", error);
         }
     };
-
-
     React.useEffect(() => {
         fetchInvoices();
     }, []);
 
     return (
-        <Box sx={{width: '80%', display: "flex", justifyContent: "center", flexDirection: "column", margin: "auto",
-            boxShadow: "0 0 5px 2px rgba(0, 0, 0, 0.5)" }}>
+        <Box sx={{width: '80%', display: "flex", justifyContent: "center", flexDirection: "column", margin: "auto"}}>
             {invoices.map((invoice, index) => (
                 <Accordion expanded={expanded === `panel${index + 1}`} onChange={handleChange(`panel${index + 1}`)}
-                           key={invoice.id_invoice} sx={{backgroundColor: "#c7f2fe"}}>
+                           key={invoice.id_invoice}>
                     <AccordionSummary
                         expandIcon={<ExpandMoreIcon/>}
                         aria-controls={`panel${index + 1}bh-content`}
@@ -98,9 +86,14 @@ const AccordionOrders: FC<AccordionOrdersProps> = ({orders}) => {
                         <Box>
                             {Array.isArray(ordersDetails[invoice.id_invoice]) && ordersDetails[invoice.id_invoice].length > 0 ? (
                                 ordersDetails[invoice.id_invoice].map((order: any, idx: number) => {
+                                    console.log("📦 Order reçu:", order); // Debug
                                     return (
                                         <Box key={idx} sx={{
-                                            display: "flex", flexDirection: "row", justifyContent: "space-around", border:"1px solid black", alignItems:"center"
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            justifyContent: "space-around",
+                                            border: "1px solid black",
+                                            alignItems: "center"
                                         }}>
                                             {order.productImage ? (
                                                 <img src={order.productImage} alt={order.productName || "Produit"}
@@ -108,7 +101,6 @@ const AccordionOrders: FC<AccordionOrdersProps> = ({orders}) => {
                                             ) : (
                                                 <Typography>Aucune image disponible</Typography>
                                             )}
-
                                             <Typography>{order.productName || "Nom du produit indisponible"}</Typography>
                                             <Typography>{order.quantity} x {order.price.toFixed(2)} €</Typography>
                                             <Typography>{(order.quantity * order.price).toFixed(2)} €</Typography>
@@ -124,6 +116,4 @@ const AccordionOrders: FC<AccordionOrdersProps> = ({orders}) => {
             ))}
         </Box>
     );
-};
-
-export default AccordionOrders;
+}

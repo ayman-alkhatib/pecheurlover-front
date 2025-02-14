@@ -29,6 +29,7 @@ const StyledInput = styled.input`
     border-radius: 8px;
     outline: none;
     transition: all 0.3s ease-in-out;
+    margin-bottom: 10px;
 
     &:focus {
         border-color: #3399ff;

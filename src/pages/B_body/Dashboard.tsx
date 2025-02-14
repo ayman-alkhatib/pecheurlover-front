@@ -1,6 +1,6 @@
 import {FC} from 'react';
 import {Box} from "@mui/material";
-import ProductSelection from "../../components/dashbaordBody/ProductSelection";
+import ProductSelection from "../../components/ProductSelection";
 import ListProductInOrder from "../../components/dashbaordBody/aside/ListProductInOrder";
 import ProductsList from "../../components/dashbaordBody/ProductsList";
 import Footer from "../C_footer/Footer";
