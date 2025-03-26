@@ -46,7 +46,6 @@ const Home = () => {
     function handleLosing() {
         setIsGameOver(true);
         setSaumons([]);
-        setCounter(0);
     }
 
   return (
@@ -87,7 +86,10 @@ const Home = () => {
             <div className="game-over">
                 <h1>Game Over</h1>
                 <h2>Vous avez attrapé {counter} saumons !</h2>
-                <button onClick={() => setIsGameOver(false)}>Rejouer</button>
+                <button onClick={() => {
+                    setCounter(0);
+                    setIsGameOver(false);
+                }}>Rejouer</button>
             </div>
                 )}
           </div>
