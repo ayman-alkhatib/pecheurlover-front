@@ -2,10 +2,21 @@ body {
     background-color: #87CEEB;
 }
 
+.game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #EDDCD9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
 .saumon-wrapper {
     position: absolute;
     width: 200px;
-    animation: swim 5s linear forwards; /* "forwards" pour maintenir la position à la fin de l'animation */
+    animation: swim 10s linear forwards;
 }
 
 .saumon-container {
@@ -26,31 +37,31 @@ body {
         transform: translateY(0);
     }
     10% {
-        transform: translateY(-90px); /* Le saumon monte */
-    }
+        transform: translateY(-40px);
+}
     20% {
-        transform: translateY(90px); /* Le saumon descend */
+        transform: translateY(40px); /* Le saumon descend */
     }
     30% {
-        transform: translateY(-90px);
+        transform: translateY(-40px);
     }
     40% {
-        transform: translateY(90px);
+        transform: translateY(40px);
     }
     50% {
-        transform: translateY(-90px);
+        transform: translateY(-40px);
     }
     60% {
-        transform: translateY(90px);
+        transform: translateY(40px);
     }
     70% {
-        transform: translateY(-90px);
+        transform: translateY(-40px);
     }
     80% {
-        transform: translateY(90px);
+        transform: translateY(40px);
     }
     90% {
-        transform: translateY(-90px);
+        transform: translateY(-40px);
     }
     100% {
         transform: translateY(0);
@@ -64,6 +75,12 @@ body {
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    text-align: center;
+}
+.saumons-score{
+    font-size: 24px;
+    color: #264143;
+    font-weight: bold;
     text-align: center;
 }
 
